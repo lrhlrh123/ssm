@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gyf.mapper.UserMapper">
+    <insert id="save" parameterType="com.gyf.model.User">
+        insert into user(username,sex,birthday,address)
+        value(#{username},#{sex},#{birthday},#{address});
+    </insert>
+    <select id="findUserById" parameterType="int" resultType="com.gyf.model.User">
+        select * from user where id=#{id}
+    </select>
+    <select id="findUserByUserQueryVo" parameterType="userQueryVO" resultType="user">
+        select u.* from user u where u.id=#{user.id}
+    </select>
+    <select id="findUserByMap" parameterType="hashmap" resultType="user">
+        SELECT u.* FROM user u WHERE username LIKE '%${username}%' AND sex = #{sex}
+    </select>
+    <select id="findUserCount" parameterType="userQueryVO" resultType="int">
+        select count(*) from user where sex=#{user.sex}
+    </select>
+    <resultMap id="userResultMap" type="user">
+        <id property="id" column="id_"/>
+        <result property="username" column="username_"/>
+        <result property="sex" column="sex_"/>
+    </resultMap>
+    <select id="findUserByIdResultMap" parameterType="int" resultMap="userResultMap">
+        select id id_,username username_,sex sex_ from user where id=#{id}
+    </select>
+    <select id="findUserList" parameterType="userQueryVo" resultType="user">
+        select * from user
+        <where>
+            <if test="user!=null">
+                <if test="user.sex!=null and user.sex!=''">
+                    sex=#{user.sex}
+                </if>
+                <if test="user.username!=null and user.username!=''">
+                    and user.username like '%${user.username}%'
+                </if>
+            </if>
+        </where>
+    </select>
+    <select id="findUserByIds" parameterType="userQueryVo" resultType="user">
+        select * from user
+        <where>
+            <if test="ids!= null and ids.size>0">
+                <foreach collection="ids" item="id" open="id in (" close=")" separator=",">
+                    ${id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <resultMap id="userRslMap" type="user">
+        <id column="user_id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="address" property="address"></result>
+        <collection property="orderList" ofType="order">
+            <id column="order_id" property="id"></id>
+            <result column="number" property="number"></result>
+            <result column="createtime" property="createtime"></result>
+            <result column="note" property="note"></result>
+            <collection property="orderDetails" ofType="orderDetail">
+                <id column="detail_id" property="id"></id>
+                <result column="items_id" property="itemsId"></result>
+                <result column="items_num" property="itemsNum"></result>
+                <association property="items" javaType="items">
+                    <id column="items_id" property="id"></id>
+                    <result column="price" property="price"></result>
+                    <result column="detail" property="detail"></result>
+                </association>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="findUserAndOrderInfo" resultMap="userRslMap">
+            SELECT
+            u.id,
+            u.username,
+            u.address,
+            o.id order_id,
+            o.number,
+            o.createtime,
+            o.note,
+            od.id detail_id,
+            od.items_id,
+            od.items_num,
+            it.name,
+            it.price,
+            it.detail
+            FROM user
+            u, orders
+            o, orderdetail od,
+            items it
+            WHERE
+            o.user_id = u.id
+            AND o.id = od.orders_id
+            AND od.items_id = it.id
+    </select>
+</mapper>

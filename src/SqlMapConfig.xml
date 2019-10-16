@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="db.properties"></properties>
+    <!--配置别名-->
+    <typeAliases>
+        <!--指定包名，别名就是类名的第一个单词的小写，UserMapper-user-->
+        <typeAlias type="com.gyf.model.User" alias="user"></typeAlias>
+        <package name="com.gyf.model"></package>
+        <package name="com.gyf.vo"></package>
+    </typeAliases>
+    <!-- 配置mybatis的环境信息 -->
+    <environments default="development">
+        <environment id="development">
+            <!-- 配置JDBC事务控制，由mybatis进行管理 -->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 配置数据源，采用dbcp连接池 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${driverClass}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--告诉myBatis加载映射文件-->
+    <mappers>
+        <!--<mapper resource="com/gyf/sqlmap/User.xml"></mapper>-->
+        <mapper resource="com/gyf/mapper/UserMapper.xml"></mapper>
+        <mapper resource="com/gyf/mapper/OrderMapper.xml"></mapper>
+    </mappers>
+</configuration>
